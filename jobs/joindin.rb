@@ -17,10 +17,16 @@ SCHEDULER.every '1m', :first_in => 0 do |job|
   puts response
 
   for talk in response["talks"]
+    speaker = ""
     if talk["start_date"] > Time.now.iso8601 #+ (talk["duration"],)
       title = talk["talk_title"]
-      speaker = "Speaker Here"
-
+      if talk["speakers"].any?
+        for speakers in talk["speaker"]
+           speaker = speaker + speakers["speaker_name"]
+         end
+      else 
+         speaker = "No Speakers"
+      end
       qr = "https://chart.googleapis.com/chart?cht=qr&chs=300x300&choe=UTF-8&chld=H|1&chl=" + talk["website_uri"] + "?qr"
       puts title + "\n" + qr
       send_event('nextUp', { text: title, moreinfo: speaker })
